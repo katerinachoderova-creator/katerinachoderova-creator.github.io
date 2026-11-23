@@ -1,1 +1,462 @@
-yo chat, kdo je to ten ježíš
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kvíz | Píseň ledu a ohně</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background:
+      linear-gradient(rgba(8,10,15,.88), rgba(8,10,15,.96)),
+      url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: #eee;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 25px;
+}
+
+.container {
+    width: 100%;
+    max-width: 750px;
+    background: rgba(15, 17, 22, .96);
+    border: 1px solid #92733e;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 0 45px rgba(0,0,0,.7);
+}
+
+h1 {
+    font-family: 'Cinzel', serif;
+    text-align: center;
+    color: #d6b36a;
+    font-size: clamp(25px, 5vw, 38px);
+    margin-bottom: 12px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #aaa;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.divider {
+    width: 100px;
+    height: 2px;
+    background: #b28a42;
+    margin: 20px auto;
+}
+
+#start-screen, #quiz-screen, #result-screen {
+    display: none;
+}
+
+#start-screen {
+    display: block;
+    text-align: center;
+}
+
+button {
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    transition: .25s;
+}
+
+.main-btn {
+    background: #8b2020;
+    color: white;
+    border: 1px solid #c08a53;
+    padding: 15px 35px;
+    font-size: 16px;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+.main-btn:hover {
+    background: #b42c2c;
+    transform: translateY(-2px);
+}
+
+.info {
+    color: #aaa;
+    font-size: 14px;
+    margin-top: 20px;
+}
+
+.progress-container {
+    background: #292929;
+    height: 8px;
+    border-radius: 10px;
+    margin: 20px 0 30px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    width: 0%;
+    background: #b28a42;
+    transition: width .3s;
+}
+
+.question-number {
+    color: #d6b36a;
+    font-family: 'Cinzel', serif;
+    margin-bottom: 12px;
+}
+
+.question {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
+.answers {
+    display: grid;
+    gap: 12px;
+}
+
+.answer {
+    padding: 16px;
+    background: #252830;
+    border: 1px solid #444;
+    color: white;
+    border-radius: 6px;
+    text-align: left;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+}
+
+.answer:hover:not(:disabled) {
+    background: #403629;
+    border-color: #b28a42;
+}
+
+.answer.correct {
+    background: #245a38;
+    border-color: #55b879;
+}
+
+.answer.wrong {
+    background: #702b2b;
+    border-color: #db6464;
+}
+
+.answer:disabled {
+    cursor: default;
+    opacity: 1;
+}
+
+.feedback {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 6px;
+    background: #252830;
+    line-height: 1.5;
+    display: none;
+}
+
+#next-btn {
+    display: none;
+    width: 100%;
+}
+
+#result-screen {
+    text-align: center;
+}
+
+.score {
+    font-family: 'Cinzel', serif;
+    font-size: 55px;
+    color: #d6b36a;
+    margin: 25px 0;
+}
+
+.result-message {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #ccc;
+}
+
+@media(max-width: 550px) {
+    .container {
+        padding: 25px 18px;
+    }
+
+    .question {
+        font-size: 19px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>⚔ PÍSEŇ LEDU A OHNĚ ⚔</h1>
+    <div class="divider"></div>
+
+    <div id="start-screen">
+        <h2 style="font-family:Cinzel;color:#ddd;margin-bottom:20px">
+            Kvíz ze světa Západozemí
+        </h2>
+
+        <p class="subtitle">
+            Znáš historii Sedmi království? Pamatuješ si rody,
+            draky, bitvy a tajemství Západozemí?
+            Otestuj své znalosti a zjisti, zda máš na to usednout
+            na Železný trůn.
+        </p>
+
+        <button class="main-btn" onclick="startQuiz()">
+            ZAHÁJIT K VÍCE
+        </button>
+
+        <p class="info">10 otázek • 4 možnosti • 1 vítěz</p>
+    </div>
+
+    <div id="quiz-screen">
+
+        <div class="progress-container">
+            <div class="progress" id="progress"></div>
+        </div>
+
+        <p class="question-number" id="question-number"></p>
+
+        <h2 class="question" id="question"></h2>
+
+        <div class="answers" id="answers"></div>
+
+        <div class="feedback" id="feedback"></div>
+
+        <button class="main-btn" id="next-btn" onclick="nextQuestion()">
+            DALŠÍ OTÁZKA →
+        </button>
+    </div>
+
+    <div id="result-screen">
+        <h2 style="font-family:Cinzel;color:#d6b36a">
+            KONEC TVÉ CESTY
+        </h2>
+
+        <div class="score" id="score"></div>
+
+        <p class="result-message" id="result-message"></p>
+
+        <button class="main-btn" onclick="restartQuiz()">
+            HRÁT ZNOVU
+        </button>
+    </div>
+
+</div>
+
+<script>
+
+const questions = [
+{
+    question: "Jak se jmenuje rodové sídlo Starků?",
+    answers: ["Casterlyova skála", "Zimohrad", "Dračí kámen", "Orlí hnízdo"],
+    correct: 1,
+    explanation: "Zimohrad je pradávné sídlo rodu Starků na Severu."
+},
+{
+    question: "Kolik draků měla Daenerys Targaryen?",
+    answers: ["Dva", "Čtyři", "Tři", "Pět"],
+    correct: 2,
+    explanation: "Daenerys měla tři draky: Drogona, Rhaegala a Viseriona."
+},
+{
+    question: "Kdo je přezdíván Králobijec?",
+    answers: ["Tyrion Lannister", "Jaime Lannister", "Sandor Clegane", "Jorah Mormont"],
+    correct: 1,
+    explanation: "Jaime Lannister získal přezdívku Králobijec poté, co zabil krále Aeryse II."
+},
+{
+    question: "Jak se jmenuje hlavní město Sedmi království?",
+    answers: ["Volantis", "Braavos", "Královo přístaviště", "Pentos"],
+    correct: 2,
+    explanation: "Královo přístaviště je hlavním městem Sedmi království."
+},
+{
+    question: "Kdo je biologickým otcem Jona Sněha?",
+    answers: ["Eddard Stark", "Robert Baratheon", "Rhaegar Targaryen", "Tywin Lannister"],
+    correct: 2,
+    explanation: "Jon Sníh je synem Rhaegara Targaryena a Lyanny Stark."
+},
+{
+    question: "Jak se jmenuje vlčí společník Jona Sněha?",
+    answers: ["Duch", "Léto", "Chlupáč", "Šedý vítr"],
+    correct: 0,
+    explanation: "Jonovým zlovlkem je Duch, který má bílou srst."
+},
+{
+    question: "Který rod má ve znaku zlatého lva?",
+    answers: ["Rod Starků", "Rod Baratheonů", "Rod Lannisterů", "Rod Tullyů"],
+    correct: 2,
+    explanation: "Zlatý lev je znakem mocného rodu Lannisterů."
+},
+{
+    question: "Jak se jmenuje kontinent, na kterém leží Západozemí?",
+    answers: ["Essos", "Westeros", "Sothoryos", "Ulthos"],
+    correct: 1,
+    explanation: "Westeros je kontinent, na kterém se nachází Sedm království."
+},
+{
+    question: "Co střeží Noční hlídka?",
+    answers: ["Železný trůn", "Dračí kámen", "Zeď na Severu", "Královskou cestu"],
+    correct: 2,
+    explanation: "Noční hlídka střeží obrovskou Zeď na severní hranici Západozemí."
+},
+{
+    question: "Jak se jmenuje meč Jona Sněha?",
+    answers: ["Led", "Dlouhý dráp", "Srdcožrout", "Světlonoš"],
+    correct: 1,
+    explanation: "Jon používá valyrijský ocelový meč Dlouhý dráp."
+}
+];
+
+let currentQuestion = 0;
+let score = 0;
+let answered = false;
+
+function startQuiz() {
+    currentQuestion = 0;
+    score = 0;
+
+    document.getElementById("start-screen").style.display = "none";
+    document.getElementById("result-screen").style.display = "none";
+    document.getElementById("quiz-screen").style.display = "block";
+
+    showQuestion();
+}
+
+function showQuestion() {
+    answered = false;
+
+    const q = questions[currentQuestion];
+
+    document.getElementById("question-number").textContent =
+        "OTÁZKA " + (currentQuestion + 1) + " / " + questions.length;
+
+    document.getElementById("question").textContent = q.question;
+
+    document.getElementById("progress").style.width =
+        (currentQuestion / questions.length * 100) + "%";
+
+    document.getElementById("feedback").style.display = "none";
+    document.getElementById("next-btn").style.display = "none";
+
+    const answers = document.getElementById("answers");
+    answers.innerHTML = "";
+
+    q.answers.forEach((answer, index) => {
+        const button = document.createElement("button");
+
+        button.className = "answer";
+        button.textContent = answer;
+
+        button.onclick = () => selectAnswer(index);
+
+        answers.appendChild(button);
+    });
+}
+
+function selectAnswer(index) {
+    if (answered) return;
+
+    answered = true;
+
+    const q = questions[currentQuestion];
+    const buttons = document.querySelectorAll(".answer");
+    const feedback = document.getElementById("feedback");
+
+    buttons.forEach((button, i) => {
+        button.disabled = true;
+
+        if (i === q.correct) {
+            button.classList.add("correct");
+        }
+
+        if (i === index && index !== q.correct) {
+            button.classList.add("wrong");
+        }
+    });
+
+    if (index === q.correct) {
+        score++;
+        feedback.innerHTML = "✓ Správně! " + q.explanation;
+        feedback.style.borderLeft = "4px solid #55b879";
+    } else {
+        feedback.innerHTML = "✗ Špatně! " + q.explanation;
+        feedback.style.borderLeft = "4px solid #db6464";
+    }
+
+    feedback.style.display = "block";
+
+    document.getElementById("next-btn").style.display = "block";
+
+    document.getElementById("next-btn").textContent =
+        currentQuestion === questions.length - 1
+        ? "ZOBRAZIT VÝSLEDEK"
+        : "DALŠÍ OTÁZKA →";
+}
+
+function nextQuestion() {
+    currentQuestion++;
+
+    if (currentQuestion < questions.length) {
+        showQuestion();
+    } else {
+        showResult();
+    }
+}
+
+function showResult() {
+    document.getElementById("quiz-screen").style.display = "none";
+    document.getElementById("result-screen").style.display = "block";
+
+    document.getElementById("score").textContent =
+        score + " / " + questions.length;
+
+    let message = "";
+
+    if (score === 10) {
+        message = "Fantastické! Jsi skutečným vládcem Západozemí. Železný trůn patří tobě!";
+    } else if (score >= 8) {
+        message = "Výborně! O Západozemí toho víš opravdu hodně. Jsi důstojným kandidátem na trůn.";
+    } else if (score >= 5) {
+        message = "Slušný výkon! Některé rody a jejich tajemství by sis měl ještě zopakovat.";
+    } else {
+        message = "Zima se blíží... Vypadá to, že tě čeká ještě hodně studia historie Sedmi království!";
+    }
+
+    document.getElementById("result-message").textContent = message;
+}
+
+function restartQuiz() {
+    document.getElementById("result-screen").style.display = "none";
+    startQuiz();
+}
+
+</script>
+
+</body>
+</html>
+
